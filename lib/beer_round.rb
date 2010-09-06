@@ -38,10 +38,6 @@ module BeerRound
     
     private
     
-    def format_row(row)
-      row.join(", ") + "\n"
-    end
-    
     def standard_cost(drink_name, count)
       PRICES[drink_name] * count
     end
@@ -65,6 +61,10 @@ module BeerRound
     
     def footer
       ""
+    end
+    
+    def format_row(row)
+      row.join(", ") + "\n"
     end
   end
   
