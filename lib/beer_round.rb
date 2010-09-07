@@ -6,16 +6,18 @@ module BeerRound
   }
   
   class Calculator
-    def initialize(drink_list)
+    def initialize(drink_list, formatter = nil, discount = nil)
       @drink_list = drink_list
+      @formatter = formatter
+      @discount = discount
     end
     
     def order
-      result = header
+      result = @formatter.header
       drink_counts.each do |drink_name, count|
         price = PRICES[drink_name]
         standard_amount = standard_cost(drink_name, count)
-        discount_amount = discount(drink_name, count)
+        discount_amount = @discount.apply(drink_name, count)
         row = [
           drink_name,
           count,
@@ -24,15 +26,15 @@ module BeerRound
           format_price(discount_amount),
           format_price(standard_amount - discount_amount)
         ]
-        result += format_row(row)
+        result += @formatter.format_row(row)
       end
-      result += footer
+      result += @formatter.footer
       result.chomp
     end
     
     def total
       drink_counts.inject(0) { |total, (drink_name, count)|
-        total + (standard_cost(drink_name, count) - discount(drink_name, count))
+        total + (standard_cost(drink_name, count) - @discount.apply(drink_name, count))
       }
     end
     
@@ -52,9 +54,10 @@ module BeerRound
     def format_price(price)
       "%.02f" % price
     end
+
   end
   
-  class CSVCalculator < Calculator
+  class CSVFormatter
     def header
       "drink, quantity, unit_price, subtotal, discount, total\n"
     end
@@ -65,53 +68,31 @@ module BeerRound
     
     def format_row(row)
       row.join(", ") + "\n"
-    end
+    end    
   end
-  
-  class XMLCalculator < Calculator
-    private
-    
+
+  class XMLFormatter
     def header
       "<order>\n"
     end
-    
+
     def footer
       "</order>"
     end
-    
+
     def format_row(row)
       "  <drink name='#{row[0]}' quantity='#{row[1]}' unit_price='#{row[2]}' subtotal='#{row[3]}' discount='#{row[4]}' total='#{row[5]}' />\n"
     end
   end
-  
-  class CSVHappyHourCalculator < CSVCalculator    
-    private
-    
-    def discount(drink_name, count)
-      PRICES[drink_name] * count * 0.25
-    end
-  end
 
-  class CSVBOGOFCalculator < CSVCalculator
-    private
-    
-    def discount(drink_name, count)
-      PRICES[drink_name] * (count / 2)
-    end
-  end
-  
-  class XMLHappyHourCalculator < XMLCalculator
-    private
-    
-    def discount(drink_name, count)
+  class HappyHourDiscount
+    def apply(drink_name, count)
       PRICES[drink_name] * count * 0.25
     end
   end
   
-  class XMLBOGOFCalculator < XMLCalculator
-    private
-    
-    def discount(drink_name, count)
+  class BOGOFDiscount
+    def apply(drink_name, count)
       PRICES[drink_name] * (count / 2)
     end
   end

@@ -2,9 +2,13 @@ require 'spec_helper'
 require_relative '../lib/beer_round'
 
 module BeerRound
-  describe CSVHappyHourCalculator do
+  describe "CSVHappyHourCalculator" do
     let(:calc) {
-      CSVHappyHourCalculator.new(%w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ])
+      Calculator.new(
+        %w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ],
+        CSVFormatter.new,
+        HappyHourDiscount.new
+      )
     }
     
     it "produces a CSV order with 25% off" do
@@ -21,9 +25,13 @@ module BeerRound
     end
   end
 
-  describe XMLHappyHourCalculator do
+  describe "XMLHappyHourCalculator" do
     let(:calc) {
-      XMLHappyHourCalculator.new(%w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ])
+      Calculator.new(
+        %w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ],
+        XMLFormatter.new,
+        HappyHourDiscount.new
+      )
     }
     
     it "produces an XML order with 25% off" do
@@ -41,9 +49,13 @@ module BeerRound
     end
   end
   
-  describe CSVBOGOFCalculator do
+  describe "CSVBOGOFCalculator" do
     let(:calc) {
-      CSVBOGOFCalculator.new(%w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ])
+      Calculator.new(
+        %w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ],
+        CSVFormatter.new,
+        BOGOFDiscount.new
+      )
     }
     
     it "produces a CSV order with every second drink free" do
@@ -60,9 +72,13 @@ module BeerRound
     end
   end
   
-  describe XMLBOGOFCalculator do
+  describe "XMLBOGOFCalculator" do
     let(:calc) {
-      XMLBOGOFCalculator.new(%w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ])
+      Calculator.new(
+        %w[ Budvar Budvar Staropramen Budvar DoubleJamesons DoubleJamesons ],
+        XMLFormatter.new,
+        BOGOFDiscount.new
+      )
     }
     
     it "produces an XML order with every second drink free" do
